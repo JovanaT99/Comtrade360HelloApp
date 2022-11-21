@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Translations</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div>
+    <form method="POST" action="/secure/translations/add">
+        <div>
+            <label>Language (ISO 2-char)</label><br />
+            <input name="language" type="text" placeholder="sr">
+        </div>
+        <div>
+            <label>Translation</label><br />
+            <input name="translation" type="text" placeholder="Pozdrav svete">
+        </div>
+        <div>
+            <button>Add translation</button>
+
+        </div>
+    </form>
+</div>
+<div>
+    <table>
+        <tbody>
+        <tr th:each="translation : ${translations}">
+            <td th:text="${translation.language}"></td>
+            <td th:text="${translation.translation}"></td>
+            <td>
+                <form method="POST" action="/secure/translations/delete">
+                    <input name="language" type="hidden" th:value="${translation.language}">
+                    <button>Delete translation</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
