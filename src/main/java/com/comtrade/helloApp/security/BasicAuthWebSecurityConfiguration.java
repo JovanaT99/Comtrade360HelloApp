@@ -23,6 +23,8 @@ public class BasicAuthWebSecurityConfiguration {
                 .csrf().disable()
                 .authorizeRequests().antMatchers("/secure/hello").authenticated()
                 .antMatchers("/secure/translations").authenticated()
+                .antMatchers("/secure/translations/add").authenticated()
+                .antMatchers("/secure/translations/delete").authenticated()
                 .and()
                 .httpBasic();
 
