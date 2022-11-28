@@ -1,13 +1,10 @@
-# Comtrade Hello World App
-This app gives user ability to see `Hello World` string translated
-to multiple languages, manually or using Systran API.
+# Nordeus Challenge
+This app parses data given by Nordeus in Nordeus jobfair challange
+and gives two endpoints `GET /game-stats` and `GET /user-stats`.
+This endpoints can be used to compute useful information for game or user.
 
-## Docker usage
 
-First build docker image with `docker build -t "hello" .`
-
-Run docker image with `docker run -p 8007:1007 hello`.
-You can change port by changing `8007` with port that you want.
+Make sure to configure `application.properties` to setup connection to your PostgreSQL database.
 
 ## Usage with Maven
 Build and run:
@@ -15,61 +12,60 @@ Build and run:
 ./mwnw spring-boot:run
 ```
 
-## Profiles
+After that run `GET /load` to load data before using other endpoints
 
-In `src/main/java/resources/application.properties` use can choose
-between two databases and two default language translation methods.
+## Endpoints
 
-By changing first profile between `h2` and `postgres` he chooses if H2 or PostgreSQL is used as database.
+### `GET /load`
+**Load data endpoint**
 
-By changing second profile between `api` and `database` he chooses if Systran API or database
-is used as default translation method when clients user `/hello` and ``/secure/hello` endpoints.
+This endpoint parses .jsonl data and loads it up into database.
+Data from .jsonl will be filtered and cleaned.
 
-## Configuration
 
-If you need to change database params change them in `src/main/java/resources/application-h2.properties`
-or `src/main/java/resources/application-postgres.properties`
 
-## Systran
+### `GET /game-stats`
+**Game stats endpoint**
 
-API key for Systran can be changed in `src/main/java/com/comtrade/helloApp/services/SystranService.java`.
+Returns statistics about the game from loaded data, it can be filtered by date or by country.
 
-## Secure pages
-
-All secure pages are protected with:
-- Username: `user`
-- Password: `password`
-
-## Pages and Endpoints
-
-### `GET /hello-rest`
-**Hello World REST endpoint**
-
-Returns fixed JSON with `Hello world`
-
-### `GET /hello`
-**Hello World page**
-
-Returns page with `Hello world` translated.
-
-Translations can received by using query params.
-- `language` Default translation is English (en).
-- `source` Default translation source is defined by spring profile.
+Request parameters are `country` (optional, 2 uppercase of country ISO 639-1 ) and `date` (optional, yyyy-mm-dd)
 
 Examples:
-- `GET /hello?language=it`
-- `GET /hello?language=it&source=api`
-- `GET /hello?language=it&source=database`
+- `GET /game-stats`
+- `GET /game-stats?country=IT`
+- `GET /game-stats?date=2010-05-23`
+- `GET /game-stats?country=IT&date=2010-05-23`
 
-### `GET /secure/hello`
-**Secure Hello World page**
+Response:
+```
+{
+ "dailyUsers": 862,
+ "logins": 230,
+ "transactions": 1021,
+ "transactionsAmount": 1225.97
+}
+```
 
-Works the same as `GET /hello` including query params.
+### `GET /user-stats?user_id={user_id}`
+**User stats endpoint**
 
+Returns statistics about the user from data, it can be filtered by date or by country.
 
-## Admin Page
-Found at `GET /secure/translations`
+Request parameters are `user_id` (required) and `date` (optional, yyyy-mm-dd)
 
-It gives user ability to add and remove translations from database.
+Examples:
+- `GET /user-stats?user_id=1623df4e-5bcb-11ed-84c2-8afbeb371208`
+- `GET /user-stats?user_id=1623df4e-5bcb-11ed-84c2-8afbeb371208&date=2010-05-10`
 
-
+Response: 
+```
+{
+ "country": "DE",
+ "name": "Romana Kade B.Eng.",
+ "logins": 230,
+ "transactions": 3,
+ "transactionsAmount": 5.97,
+ "lastLoginDays": 2
+}
+```
